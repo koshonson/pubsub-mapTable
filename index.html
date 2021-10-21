@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.9.0/css/ol.css" type="text/css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/openlayers/4.6.5/ol-debug.js" defer></script>
+    <script src="data/tableData.js" defer></script>
+    <script src="utils/index.js" defer></script>
+    <script src="components/emitter.js" defer></script>
+    <script src="components/logger.js" defer></script>
+    <script src="components/state.js" defer></script>
+    <script src="components/map.js" defer></script>
+    <script src="components/table.js" defer></script>
+    <script src="index.js" defer></script>
+    <title>Quick mapTable</title>
+</head>
+<body>
+    <div Panel RootPanel class="container main-color flex-center flex-column">
+        <div Panel class="main-box flex-center content">
+            <div Panel class="box map" id="map">
+                <span class="box-title">Map</span>
+            </div>
+            <div Panel class="box table" id="table">
+                <span class="box-title">Table</span>
+            </div>
+        </div>
+        <div Panel class="main-box flex-center debug">
+            <div Panel class="box logger" id="logger">
+                <span class="box-title">Logger</span>
+                <div class="console" id="console"></div>
+            </div>
+            <div Panel class="box state" id="state">
+                <span class="box-title">State</span>
+                <h4>selection:</h4>
+                <div class="selection" id="selection"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
