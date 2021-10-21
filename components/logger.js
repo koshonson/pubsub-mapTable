@@ -1,3 +1,30 @@
+const parseChannel = function (channel) {
+  return channel.split('-');
+};
+
+const toUpperCase = function (string) {
+  return string.slice(0, 1).toUpperCase() + string.slice(1);
+};
+
+const hoveredOrSelectedTemplate = ({ target, channel, ts, args }) => {
+  const msgBoolStatus = {
+    hovered: { add: 'gained', remove: 'lost' },
+    selected: { add: 'selected', remove: 'removed from selection' }
+  };
+  const msgTemplates = {
+    hovered: (subject, id, bool) => `${toUpperCase(subject)} ${id} ${bool} hover.`,
+    selected: (subject, id, bool) => `${toUpperCase(subject)} ${id} was ${bool}.`
+  };
+  return (() => {
+    const [subject, action] = parseChannel(channel);
+    const [[id, bool]] = args;
+    const status = bool ? 'add' : 'remove';
+    const msg = msgTemplates[action](subject, id, msgBoolStatus[action][status]);
+
+    return { target, channel, msg, ts };
+  })();
+};
+
 // Logger class
 const Logger = function (emitter, target_id = 'console') {
   this.emitter = emitter;
@@ -15,8 +42,8 @@ const Logger = function (emitter, target_id = 'console') {
   };
 };
 
-Logger.prototype.parseChannel = function (channel) {
-  return channel.split(':');
+Logger.prototype.parseTarget = function (fullname) {
+  return fullname.split(':');
 };
 
 Logger.prototype.buildLog = {
@@ -24,31 +51,15 @@ Logger.prototype.buildLog = {
     const [msg] = args;
     return { target, channel, msg, ts };
   },
-  'marker-hovered': ({ target, channel, ts, args }) => {
-    const [[id, bool]] = args;
-    const msg = `Marker ${id} ${bool ? 'gained' : 'lost'} hover.`;
-    return { target, channel, msg, ts };
-  },
-  'marker-selected': ({ target, channel, ts, args }) => {
-    const [[id, bool]] = args;
-    const msg = `Marker ${id} was ${bool ? 'selected' : 'removed from selection'}.`;
-    return { target, channel, msg, ts };
-  },
-  'row-hovered': ({ target, channel, ts, args }) => {
-    const [[id, bool]] = args;
-    const msg = `Row ${id} ${bool ? 'gained' : 'lost'} hover.`;
-    return { target, channel, msg, ts };
-  },
-  'row-selected': ({ target, channel, ts, args }) => {
-    const [[id, bool]] = args;
-    const msg = `Marker ${id} was ${bool ? 'selected' : 'removed from selection'}.`;
-    return { target, channel, msg, ts };
-  }
+  'marker-hovered': log => hoveredOrSelectedTemplate(log),
+  'marker-selected': log => hoveredOrSelectedTemplate(log),
+  'row-hovered': log => hoveredOrSelectedTemplate(log),
+  'row-selected': log => hoveredOrSelectedTemplate(log)
 };
 
 Logger.prototype.log = function (_channel, ...args) {
   const ts = this.timestamp();
-  const [target, channel] = this.parseChannel(_channel);
+  const [target, channel] = this.parseTarget(_channel);
   const log = this.buildLog[channel]({ target, channel, ts, args: [...args] });
   if (!this.logs.length || this.logIsNew(log)) {
     this.logs.unshift(log);
