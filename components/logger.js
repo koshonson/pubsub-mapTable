@@ -112,6 +112,11 @@ Logger.prototype.timestamp = function () {
 // Logger initialization and setup
 const logger = new Logger(emitter);
 
+const channelClassification = {
+  marker: 'map',
+  row: 'table'
+};
+
 logger.emitter.on(
   'general-logs',
   (msg => {
@@ -119,33 +124,16 @@ logger.emitter.on(
   }).bind(logger)
 );
 
-logger.emitter.on(
-  'marker-hovered',
-  ((...e) => {
-    logger.log('map:marker-hovered', e);
-  }).bind(logger)
-);
-
-logger.emitter.on(
-  'marker-selected',
-  ((...e) => {
-    logger.log('map:marker-selected', e);
-  }).bind(logger)
-);
-
-logger.emitter.on(
-  'row-hovered',
-  ((...e) => {
-    logger.log('table:row-hovered', e);
-  }).bind(logger)
-);
-
-logger.emitter.on(
-  'row-selected',
-  ((...e) => {
-    logger.log('table:row-selected', e);
-  }).bind(logger)
-);
+['marker-hovered', 'marker-selected', 'row-hovered', 'row-selected'].forEach(channel => {
+  logger.emitter.on(
+    channel,
+    ((...e) => {
+      const subject = channel.split('-')[0];
+      const fullname = `${channelClassification[subject]}:${channel}`;
+      logger.log(fullname, e);
+    }).bind(logger)
+  );
+});
 
 emitter.emit('general-logs', 'Emitter initialized.');
 emitter.emit('general-logs', 'Logger component loaded.');
