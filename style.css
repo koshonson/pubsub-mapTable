@@ -104,6 +104,19 @@ body {
   background-color: rgba(50, 0, 0, 0.1);
 }
 
+.radio-filter {
+  display: flex;
+  margin-bottom: 5px;
+}
+
+.radio-filter-input {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-right: 10px;
+}
+
 .logger {
   display: flex;
   flex-direction: column;

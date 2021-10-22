@@ -11,6 +11,7 @@
     <script src="utils/index.js" defer></script>
     <script src="components/emitter.js" defer></script>
     <script src="components/logger.js" defer></script>
+    <script src="components/logFilter.js" defer></script>
     <script src="components/state.js" defer></script>
     <script src="components/map.js" defer></script>
     <script src="components/table.js" defer></script>
@@ -30,6 +31,24 @@
         <div Panel class="main-box flex-center debug">
             <div Panel class="box logger" id="logger">
                 <span class="box-title">Logger</span>
+                <div class="radio-filter" id="radio-filter">
+                    <div class="radio-filter-input">
+                        <label for="all">all</label>
+                        <input class="radio" type="radio" name="log-filter" value="all" checked>
+                    </div>
+                    <div class="radio-filter-input">
+                        <label for="app">app</label>
+                        <input class="radio" type="radio" name="log-filter" value="app">
+                    </div>
+                    <div class="radio-filter-input">
+                        <label for="map">map</label>
+                        <input class="radio" type="radio" name="log-filter" value="map">
+                    </div>
+                    <div class="radio-filter-input">
+                        <label for="table">table</label>
+                        <input class="radio" type="radio" name="log-filter" value="table">
+                    </div>
+                </div>
                 <div class="console" id="console"></div>
             </div>
             <div Panel class="box state" id="state">

@@ -1,8 +1,12 @@
+const parseTarget = function (fullname) {
+  return fullname.split(':');
+};
+
 const parseChannel = function (channel) {
   return channel.split('-');
 };
 
-const toUpperCase = function (string) {
+const capitalize = function (string) {
   return string.slice(0, 1).toUpperCase() + string.slice(1);
 };
 
@@ -12,8 +16,8 @@ const hoveredOrSelectedTemplate = ({ target, channel, ts, args }) => {
     selected: { add: 'selected', remove: 'removed from selection' }
   };
   const msgTemplates = {
-    hovered: (subject, id, bool) => `${toUpperCase(subject)} ${id} ${bool} hover.`,
-    selected: (subject, id, bool) => `${toUpperCase(subject)} ${id} was ${bool}.`
+    hovered: (subject, id, bool) => `${capitalize(subject)} ${id} ${bool} hover.`,
+    selected: (subject, id, bool) => `${capitalize(subject)} ${id} was ${bool}.`
   };
   return (() => {
     const [subject, action] = parseChannel(channel);
@@ -33,6 +37,7 @@ const Logger = function (emitter, target_id = 'console') {
   this.logCfg = {
     prefix: '>',
     delimiter: ' ',
+    filterMode: null,
     parts: {
       ts: true,
       target: true,
@@ -42,8 +47,9 @@ const Logger = function (emitter, target_id = 'console') {
   };
 };
 
-Logger.prototype.parseTarget = function (fullname) {
-  return fullname.split(':');
+Logger.prototype.setFilterMode = function (mode) {
+  this.logCfg.filterMode = mode === 'all' ? null : mode;
+  this.printLogs();
 };
 
 Logger.prototype.buildLog = {
@@ -59,7 +65,7 @@ Logger.prototype.buildLog = {
 
 Logger.prototype.log = function (_channel, ...args) {
   const ts = this.timestamp();
-  const [target, channel] = this.parseTarget(_channel);
+  const [target, channel] = parseTarget(_channel);
   const log = this.buildLog[channel]({ target, channel, ts, args: [...args] });
   if (!this.logs.length || this.logIsNew(log)) {
     this.logs.unshift(log);
@@ -85,6 +91,11 @@ Logger.prototype.formatMsg = function (str, key) {
   return formatters[key](str);
 };
 
+Logger.prototype.filterByTarget = function (_target) {
+  if (!_target) return this.logs;
+  return this.logs.filter(({ target }) => target === _target);
+};
+
 Logger.prototype.printLog = function (_log, config = this.logCfg) {
   const log = [];
   Object.keys(config.parts).forEach(key => {
@@ -100,7 +111,7 @@ Logger.prototype.printLog = function (_log, config = this.logCfg) {
 
 Logger.prototype.printLogs = function () {
   this.el.innerText = '';
-  const filtered = this.logs.map(log => log);
+  const filtered = this.filterByTarget(this.logCfg.filterMode);
   filtered.forEach(log => {
     const p = document.createElement('p');
     p.innerText = this.printLog(log);
@@ -127,6 +138,13 @@ const channelClassification = {
   marker: 'map',
   row: 'table'
 };
+
+logger.emitter.on(
+  'log-filter',
+  (value => {
+    logger.setFilterMode(value);
+  }).bind(logger)
+);
 
 logger.emitter.on(
   'general-logs',
