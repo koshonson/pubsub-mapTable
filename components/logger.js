@@ -143,6 +143,7 @@ logger.emitter.on(
   'log-filter',
   (value => {
     logger.setFilterMode(value);
+    logger.log('app:general-logs', `Log filter set to ${value}.`);
   }).bind(logger)
 );
 
